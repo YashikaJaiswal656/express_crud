@@ -13,6 +13,7 @@ const [price,setPrice]=useState("")
 const [detail,setDetail]=useState("")
 const[description,setDescription]=useState("")
 const[file,setFile]=useState("")
+
 const handleSubmit=async(e)=>{
 e.preventDefault()
 try{

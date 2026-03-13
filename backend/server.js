@@ -49,6 +49,14 @@ const sql="SELECT * FROM `product` ";
     res.json(result)
  })
 })
+app.delete("/product_delete/:id",(req,res)=>{
+    const id=req.params.id;
+    const sql="DELETE FROM `product` WHERE id=?";
+    db.query(sql,[id],(err,result)=>{
+        if(err) return res.send(err)
+            res.send("delete sucess");
+    })
+})
 app.listen(5000,()=>{
     console.log("the server has started");
 });
