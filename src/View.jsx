@@ -53,7 +53,7 @@ function View(){
                         <td ><button className="delete" onClick={()=>handleDelete(product.id)} >Delete</button></td>
                         
                         
-                        <td ><Link className="edit" to={product.id}>Edit</Link></td>
+                        <td ><Link className="edit" to={`/edit/${product.id}`}>Edit</Link></td>
                         
                     </tr>
                     ))}

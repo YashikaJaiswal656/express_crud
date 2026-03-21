@@ -2,6 +2,20 @@ const express =require("express");
 const mysql =require("mysql2");
 const cors =require("cors");
 const app=express();
+const multer=require("multer");
+const path =require("path");
+app.use("/uploads", express.static("uploads"));
+const storage=multer.diskStorage({
+    
+    destination:(req,file,cb)=>{
+        cb(null,"uploads/");
+
+    },
+    filename:(req,file,cb)=>{
+        cb(null,Date.now()+path.extname(file.originalname));
+    }
+});
+const upload=multer({storage})
 app.use(cors());
 app.use(express.json());
 const db= mysql.createConnection({
@@ -27,14 +41,6 @@ app.post("/create_cat",(req , res)=>{
         res.send("category saved");
     });
 });
-app.post("/product",(req,res)=>{
-    const {name,catt,detail,description,price,file}=req.body;
-     const sql="INSERT INTO `product`( `name`, `cat`, `detail`, `description`, `price`, `file`) VALUES (?,?,?,?,?,?)";
-     db.query(sql,[name,catt,detail,description,price,file],(err,result)=>{
-        if(err) return res.send(err)
-            res.send("product saved");
-     });
-});
 app.get("/category",(req , res)=>{
     const sql="SELECT * FROM `cat` ";
     db.query(sql,(err,result)=>{
@@ -49,6 +55,23 @@ const sql="SELECT * FROM `product` ";
     res.json(result)
  })
 })
+app.get("/edit_view/:id",(req,res)=>{
+const id=req.params.id;
+const sql="SELECT * FROM product WHERE id=?";
+db.query(sql,[id],(err,result)=>{
+if(err) return res.send(err);
+res.json(result)
+})
+})
+app.put("/update/:id",(req ,res)=>{
+    const id=req.params.id;
+    const {name,catt,detail,description,price,file}=req.body;
+    const sql="UPDATE `product` SET `name`=?,`cat`=?,`detail`=?,`description`=?,`price`=?,`file`=? WHERE id=?";
+    db.query(sql,[name,catt,detail,description,price,file,id],(err,result)=>{
+        if(err) return res.send(err);
+        res.json(result)
+    })
+})
 app.delete("/product_delete/:id",(req,res)=>{
     const id=req.params.id;
     const sql="DELETE FROM `product` WHERE id=?";
@@ -57,6 +80,16 @@ app.delete("/product_delete/:id",(req,res)=>{
             res.send("delete sucess");
     })
 })
+app.post("/product",upload.single("file"),(req,res)=>{
+const {name,catt,price,detail,description}=req.body;
+const file=req.file.filename;
+const sql="INSERT INTO `product`( `name`, `cat`, `detail`, `description`, `price`, `file`) VALUES (?,?,?,?,?,?)";
+db.query(sql,[name,catt,detail,description,price,file],(err,result)=>{
+        if(err) return res.json(err)
+            res.json("product saved");
+     });
+})
+
 app.listen(5000,()=>{
     console.log("the server has started");
 });

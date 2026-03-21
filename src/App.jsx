@@ -12,19 +12,19 @@ const [catt,setCategorie]=useState("")
 const [price,setPrice]=useState("")
 const [detail,setDetail]=useState("")
 const[description,setDescription]=useState("")
-const[file,setFile]=useState("")
+const[file,setFile]=useState(null)
 
 const handleSubmit=async(e)=>{
 e.preventDefault()
+const formData=new FormData()
+formData.append('name',name);
+formData.append('catt',catt);
+formData.append('price',price);
+formData.append('detail',detail);
+formData.append('description',description);
+formData.append('file',file);
 try{
-  await axios.post("http://localhost:5000/product",{
-    name:name,
-    catt:catt,
-    price:price,
-    detail:detail,
-    description:description,
-    file:file
-  })
+  await axios.post("http://localhost:5000/product",formData)
   alert("product inserted")
 }
 catch(err){
@@ -49,7 +49,7 @@ return (
       <h3>Submit a Product</h3>
     </div>
     <hr className="hr"/>
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} encType="multipart/form-data">
       <div className="grid_form">
         <div className="form_input">
           <label htmlFor="">Product Name</label>
@@ -80,7 +80,7 @@ return (
         </div>
         <div className="form_input">
           <label >File</label>
-          <input type="file" name="file" value={file} onChange={(e)=>setFile(e.target.value)}/>
+          <input type="file" name="file"  onChange={(e)=>setFile(e.target.files[0])}/>
         </div>
       </div>
       <button
